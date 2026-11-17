@@ -1,0 +1,43 @@
+name: Resoa no ar
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: monitor
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checar site e servidor
+        id: check
+        run: bash check.sh
+
+      - name: Avisar queda ou volta
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash alert.sh "${{ steps.check.outputs.status }}"
+
+      # O GitHub desliga tarefas agendadas de repositórios públicos sem atividade
+      # por 60 dias. Um commit vazio por mês mantém o monitor vivo.
+      - name: Manter o monitor ativo
+        if: github.event_name == 'schedule'
+        run: |
+          last="$(git log -1 --format=%ct)"
+          if [ $(( $(date +%s) - last )) -gt $(( 30 * 24 * 3600 )) ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit --allow-empty -m "Manter monitor ativo"
+            git push
+          fi
