@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "*/10 * * * *"
   workflow_dispatch:
+    inputs:
+      simular_queda:
+        description: "Simular uma queda para testar o alerta"
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -22,11 +27,14 @@ jobs:
 
       - name: Checar site e servidor
         id: check
+        env:
+          SIMULAR_QUEDA: ${{ inputs.simular_queda }}
         run: bash check.sh
 
       - name: Avisar queda ou volta
         env:
           GH_TOKEN: ${{ github.token }}
+          SIMULAR_QUEDA: ${{ inputs.simular_queda }}
         run: bash alert.sh "${{ steps.check.outputs.status }}"
 
       # O GitHub desliga tarefas agendadas de repositórios públicos sem atividade

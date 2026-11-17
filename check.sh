@@ -8,6 +8,10 @@ API_URL="https://www.resoaclinic.com.br/.well-known/oauth-protected-resource"
 ATTEMPTS=3
 WAIT_SECONDS=60
 REPORT="report.md"
+if [ "${SIMULAR_QUEDA:-false}" = "true" ]; then
+  API_URL="https://www.resoaclinic.com.br/.well-known/simulacao-de-queda"
+  ATTEMPTS=1
+fi
 
 probe() {
   # $1 = nome, $2 = url, $3 = texto que a resposta precisa conter

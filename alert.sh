@@ -7,6 +7,8 @@ STATUS="$1"
 LABEL="fora-do-ar"
 OWNER="${GITHUB_REPOSITORY%%/*}"
 NOW="$(TZ=America/Sao_Paulo date '+%d/%m/%Y %H:%M')"
+PREFIX=""
+[ "${SIMULAR_QUEDA:-false}" = "true" ] && PREFIX="[TESTE] "
 
 gh label create "$LABEL" --color B60205 --description "Resoa fora do ar" >/dev/null 2>&1 || true
 
@@ -15,7 +17,7 @@ open_issue="$(gh issue list --label "$LABEL" --state open --json number --jq '.[
 if [ "$STATUS" = "down" ]; then
   if [ -z "$open_issue" ]; then
     gh issue create \
-      --title "Resoa fora do ar desde $NOW (horário de Brasília)" \
+      --title "${PREFIX}Resoa fora do ar desde $NOW (horário de Brasília)" \
       --label "$LABEL" \
       --assignee "$OWNER" \
       --body-file report.md
