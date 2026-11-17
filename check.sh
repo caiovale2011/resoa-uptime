@@ -59,8 +59,10 @@ if [ "$status" = "down" ]; then
     if [ "$indicator" != "none" ] && [ "$indicator" != "desconhecido" ]; then
       echo "**A própria Vercel (hospedagem) informa problema agora:** $description — veja https://www.vercel-status.com"
       echo "Provavelmente não é defeito do Resoa; é esperar a Vercel resolver."
+    elif [ "$indicator" = "none" ]; then
+      echo "A Vercel informa que a hospedagem dela está normal. A causa tende a estar do lado do Resoa: último deploy, configuração ou domínio."
     else
-      echo "Página de status da Vercel: $description. Vale olhar o painel da Vercel e o último deploy."
+      echo "Não foi possível consultar o status da Vercel (https://www.vercel-status.com). Vale olhar lá e no último deploy."
     fi
   } > "$REPORT"
 fi
